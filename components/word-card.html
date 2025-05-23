@@ -1,0 +1,18 @@
+<!-- components/word-card.html -->
+<div class="word-card relative {{bgColor}} p-4 rounded shadow hover:shadow-md transition cursor-pointer group">
+  <!-- Edit icon in top-right -->
+  <button onclick="editWord('{{id}}')" class="absolute top-2 right-10 p-1 bg-white rounded-full shadow hidden group-hover:block">
+    <i data-lucide="pencil" class="w-4 h-4 text-gray-700"></i>
+  </button>
+
+  <!-- 🗑️ Delete icon -->
+  <button onclick="deleteWord('{{id}}')" class="absolute top-2 right-2 p-1 bg-white rounded-full shadow hidden group-hover:block">
+    <i data-lucide="trash-2" class="w-4 h-4 text-red-600"></i>
+  </button>
+
+  <h2 class="text-xl font-bold">{{word}}</h2>
+  <span class="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded">{{type}}</span>
+  <p class="mt-2 text-sm text-gray-700">{{definition}}</p>
+  <p class="mt-1 italic text-gray-500">{{example}}</p>
+  <p class="text-right text-xs text-gray-500 mt-3">{{date}}</p>
+</div>

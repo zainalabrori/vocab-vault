@@ -1,0 +1,18 @@
+<div id="addModal" class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden flex items-center justify-center">
+  <div class="bg-white p-6 rounded shadow w-full max-w-md">
+    <h2 id="modalTitle" class="text-xl font-bold mb-4">Add New Word</h2>
+    <form id="add-word-form" class="space-y-4">
+      <input required type="text" placeholder="Word" class="w-full border p-2 rounded" />
+      <input required type="text" placeholder="Definition" class="w-full border p-2 rounded" />
+      <input required type="text" placeholder="Example Sentence" class="w-full border p-2 rounded" />
+      <select required class="w-full border p-2 rounded">
+        <option value="">Select Type</option>
+        <option value="noun">Noun</option>
+        <option value="verb">Verb</option>
+        <option value="adjective">Adjective</option>
+        <option value="adverb">Adverb</option>
+      </select>
+      <button id="submitBtn" type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Add Word</button>
+    </form>
+  </div>
+</div>

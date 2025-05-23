@@ -1,0 +1,36 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vocab Vault</title>
+  <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- JS -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+  <!-- Placeholders for injected components -->
+  <div id="navbar"></div>
+
+  <main class="p-4 max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-4">My Vocabulary List</h1>
+
+    <button onclick="openModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">+ Add New Word</button>
+
+    <!-- Modal Placeholder -->
+    <div id="modal"></div>
+
+    <div id="word-list" class="mt-6 grid gap-4 sm:grid-cols-2">
+      <!-- Word cards will go here -->
+    </div>
+  </main>
+
+</body>
+</html>
