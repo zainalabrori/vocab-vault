@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "text": "Ephemeral",
+    "definition": "Lasting for a very short time.",
+    "example": "The beauty of the cherry blossoms is ephemeral.",
+    "type": "adjective",
+    "date": "15 Jul 2023"
+  },
+  {
+    "id": 2,
+    "text": "Ubiquitous",
+    "definition": "Present, appearing, or found everywhere.",
+    "example": "Mobile phones are now ubiquitous.",
+    "type": "adjective",
+    "date": "16 Jul 2023"
+  }
+]

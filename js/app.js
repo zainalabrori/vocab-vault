@@ -1,194 +1,178 @@
 // js/app.js
-
-// Load components dynamically
+const API_URL = "http://localhost:3000/api/words";
 let wordCardTemplate = "";
-let editingWordId = null; // null = not editing
+let editingWordId = null;
+let allWords = [];
+let currentPage = 1;
+const wordsPerPage = 6;
 
-async function loadComponent(id, path) {
-  const res = await fetch(path);
-  const html = await res.text();
-  document.getElementById(id).innerHTML = html;
-
-  if (id === "modal") {
-    bindFormEvents(); // re-bind form after loading modal
-  }
+// Function to handle API requests with error handling
+async function fetchAPI(url, options) {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("API Error:", error);
+        // You can add user-facing error messages here
+    }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  loadComponent("navbar", "components/navbar.html");
-  loadComponent("modal", "components/add-word-form.html");
-  loadWords();
+async function loadComponent(id, path) {
+    const res = await fetch(path);
+    const html = await res.text();
+    document.getElementById(id).innerHTML = html;
+    if (id === "modal") {
+        bindFormEvents();
+    }
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+    loadComponent("navbar", "components/navbar.html");
+    loadComponent("modal", "components/add-word-form.html");
+    wordCardTemplate = await fetch("components/word-card.html").then(res => res.text());
+    await loadWords();
+    document.getElementById("search-input").addEventListener("input", handleSearch);
+    document.getElementById("sort-select").addEventListener("change", handleSort);
 });
 
 function openModal() {
-  document.getElementById("addModal")?.classList.remove("hidden");
+    document.getElementById("addModal")?.classList.remove("hidden");
 }
 
 function closeModal() {
-  document.getElementById("addModal")?.classList.add("hidden");
-  editingWordId = null;
-  document.getElementById("modalTitle").textContent = "Add New Word";
-  document.getElementById("submitBtn").textContent = "Add Word";
-}
-
-// Bind form submit to save word
-function bindFormEvents() {
-  const form = document.getElementById("add-word-form");
-  if (!form) return;
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    // const inputs = form.querySelectorAll("input, select");
-    // const [wordInput, defInput, exampleInput, typeSelect] = inputs;
-
-    const [wordInput, defInput, exampleInput, typeSelect] =
-      form.querySelectorAll("input, select");
-    const words = JSON.parse(localStorage.getItem("vocabWords") || "[]");
-
-    // const word = {
-    //   id: Date.now(),
-    //   text: wordInput.value,
-    //   definition: defInput.value,
-    //   example: exampleInput.value,
-    //   type: typeSelect.value,
-    //   date: new Date().toLocaleDateString("en-GB", {
-    //     day: "2-digit",
-    //     month: "short",
-    //     year: "numeric",
-    //   }), // e.g., "22 May 2025"
-    // };
-
-    if (editingWordId) {
-      // ✅ Edit mode
-      const index = words.findIndex((w) => w.id == editingWordId);
-      if (index !== -1) {
-        words[index] = {
-          ...words[index],
-          text: wordInput.value,
-          definition: defInput.value,
-          example: exampleInput.value,
-          type: typeSelect.value,
-          // Keep original date
-        };
-      }
-      editingWordId = null; // reset after update
-    } else {
-      // ➕ Add new word
-      const word = {
-        id: Date.now(),
-        text: wordInput.value,
-        definition: defInput.value,
-        example: exampleInput.value,
-        type: typeSelect.value,
-        date: new Date().toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }),
-      };
-      words.push(word);
-    }
-
-    // saveWord(word);
-    localStorage.setItem("vocabWords", JSON.stringify(words));
-    renderWords(words);
-    closeModal();
-    form.reset();
-
+    document.getElementById("addModal")?.classList.add("hidden");
+    editingWordId = null;
     document.getElementById("modalTitle").textContent = "Add New Word";
     document.getElementById("submitBtn").textContent = "Add Word";
-  });
+    document.getElementById("add-word-form").reset();
 }
 
-// Save to localStorage
-function saveWord(word) {
-  const words = JSON.parse(localStorage.getItem("vocabWords") || "[]");
-  words.push(word);
-  localStorage.setItem("vocabWords", JSON.stringify(words));
-  renderWords(words);
+function bindFormEvents() {
+    const form = document.getElementById("add-word-form");
+    if (!form) return;
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const [wordInput, defInput, exampleInput, typeSelect] = form.querySelectorAll("input, select");
+        const wordData = {
+            text: wordInput.value,
+            definition: defInput.value,
+            example: exampleInput.value,
+            type: typeSelect.value,
+        };
+
+        const url = editingWordId ? `${API_URL}/${editingWordId}` : API_URL;
+        const method = editingWordId ? "PUT" : "POST";
+
+        await fetchAPI(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(wordData),
+        });
+
+        await loadWords();
+        closeModal();
+    });
 }
 
-// Load and render from localStorage
-function loadWords() {
-  const words = JSON.parse(localStorage.getItem("vocabWords") || "[]");
-  renderWords(words);
+async function loadWords() {
+    allWords = await fetchAPI(API_URL);
+    renderWords(allWords);
 }
-
-// Load card template once
-fetch("components/word-card.html")
-  .then((res) => res.text())
-  .then((html) => {
-    wordCardTemplate = html;
-    loadWords(); // Load words after template is ready
-  });
 
 function renderWords(words) {
-  const list = document.getElementById("word-list");
-  list.innerHTML = "";
-  const bgColors = [
-    "bg-red-100",
-    "bg-green-100",
-    "bg-blue-100",
-    "bg-yellow-100",
-    "bg-purple-100",
-    "bg-pink-100",
-    "bg-indigo-100",
-    "bg-teal-100",
-    "bg-orange-100",
-  ];
+    const list = document.getElementById("word-list");
+    list.innerHTML = "";
+    const paginatedWords = words.slice((currentPage - 1) * wordsPerPage, currentPage * wordsPerPage);
+    paginatedWords.forEach((word, index) => {
+        const card = createWordCard(word, index);
+        list.appendChild(card);
+    });
+    renderPagination(words.length);
+    lucide.createIcons();
+}
 
-  words.forEach((word) => {
-    const randomColor = bgColors[Math.floor(Math.random() * bgColors.length)];
-    // Replace placeholders with actual values
+function createWordCard(word, index) {
+    // Remove old bgColor system - now handled by theme CSS
     const cardHTML = wordCardTemplate
-      .replace("{{word}}", word.text)
-      .replace("{{type}}", word.type)
-      .replace("{{definition}}", word.definition)
-      .replace("{{example}}", word.example)
-      .replace("{{date}}", word.date)
-      // .replace("{{id}}", word.id)
-      .replace(/{{id}}/g, word.id)
-      .replace("{{bgColor}}", randomColor);
-
+        .replace(/{{id}}/g, word.id)
+        .replace("{{word}}", word.text)
+        .replace("{{type}}", word.type)
+        .replace("{{definition}}", word.definition)
+        .replace("{{example}}", word.example)
+        .replace("{{date}}", word.date)
+        .replace("{{bgColor}}", ""); // Remove bgColor placeholder
+    
     const card = document.createElement("div");
     card.innerHTML = cardHTML;
-    list.appendChild(card.firstElementChild); // only append the actual .word-card div
-  });
-
-  lucide.createIcons(); // Call after rendering cards
+    
+    // Add staggered animation delay for smooth appearance
+    const cardElement = card.firstElementChild;
+    cardElement.style.animationDelay = `${index * 0.1}s`;
+    
+    return cardElement;
 }
 
-function editWord(id) {
-  const words = JSON.parse(localStorage.getItem("vocabWords") || "[]");
-  const word = words.find((w) => w.id == id);
-  if (!word) return;
-
-  editingWordId = id;
-  openModal();
-
-  // Change modal title & button
-  document.getElementById("modalTitle").textContent = "Edit Word";
-  document.getElementById("submitBtn").textContent = "Update Word";
-
-  // Fill form
-  const form = document.getElementById("add-word-form");
-  if (!form) return;
-
-  const [wordInput, defInput, exampleInput, typeSelect] =
-    form.querySelectorAll("input, select");
-  wordInput.value = word.text;
-  defInput.value = word.definition;
-  exampleInput.value = word.example;
-  typeSelect.value = word.type;
+async function editWord(id) {
+    const word = await fetchAPI(`${API_URL}/${id}`);
+    if (!word) return;
+    editingWordId = id;
+    openModal();
+    document.getElementById("modalTitle").textContent = "Edit Word";
+    document.getElementById("submitBtn").textContent = "Update Word";
+    const form = document.getElementById("add-word-form");
+    if (!form) return;
+    const [wordInput, defInput, exampleInput, typeSelect] = form.querySelectorAll("input, select");
+    wordInput.value = word.text;
+    defInput.value = word.definition;
+    exampleInput.value = word.example;
+    typeSelect.value = word.type;
 }
- 
-function deleteWord(id) {
-  if (!confirm("Delete this word?")) return;
 
-  const words = JSON.parse(localStorage.getItem("vocabWords") || "[]");
-  // const updated = words.filter(w => w.id != id);
-  const updated = words.filter((w) => w.id !== Number(id));
-  console.log("Deleting ID:", id, "Type:", typeof id);
-  localStorage.setItem("vocabWords", JSON.stringify(updated));
-  renderWords(updated);
+async function deleteWord(id) {
+    if (!confirm("Delete this word?")) return;
+    await fetchAPI(`${API_URL}/${id}`, { method: "DELETE" });
+    await loadWords();
+}
+
+function handleSearch(event) {
+    const searchTerm = event.target.value.toLowerCase();
+    const filteredWords = allWords.filter(word =>
+        word.text.toLowerCase().includes(searchTerm) ||
+        word.definition.toLowerCase().includes(searchTerm)
+    );
+    currentPage = 1; // Reset to first page when searching
+    renderWords(filteredWords);
+}
+
+function handleSort(event) {
+    const sortBy = event.target.value;
+    let sortedWords = [...allWords];
+    if (sortBy === "alphabetical") {
+        sortedWords.sort((a, b) => a.text.localeCompare(b.text));
+    } else if (sortBy === "date") {
+        sortedWords.sort((a, b) => new Date(b.date.split('/').reverse().join('-')) - new Date(a.date.split('/').reverse().join('-')));
+    }
+    renderWords(sortedWords);
+}
+
+function renderPagination(totalWords) {
+    const paginationContainer = document.getElementById("pagination");
+    paginationContainer.innerHTML = "";
+    const totalPages = Math.ceil(totalWords / wordsPerPage);
+    
+    if (totalPages <= 1) return; // Don't show pagination if only one page
+    
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement("button");
+        pageButton.textContent = i;
+        pageButton.className = `px-3 py-1 rounded transition-all ${currentPage === i ? 'theme-pagination-active' : 'theme-pagination-inactive'}`;
+        pageButton.addEventListener("click", () => {
+            currentPage = i;
+            renderWords(allWords);
+        });
+        paginationContainer.appendChild(pageButton);
+    }
 }

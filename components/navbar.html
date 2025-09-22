@@ -1,7 +1,14 @@
 <!-- components/navbar.html -->
-<nav class="bg-white shadow-md px-4 py-3">
+<nav class="theme-nav theme-transition shadow-md px-4 py-3">
   <div class="max-w-4xl mx-auto flex justify-between items-center">
-    <span class="text-xl font-semibold text-blue-600">Vocab Vault</span>
-    <button class="text-sm text-gray-600 hover:text-blue-600">Toggle Dark Mode</button>
+    <span class="text-xl font-semibold theme-accent-text">Vocab Vault</span>
+    <div class="flex items-center space-x-4">
+      <button onclick="window.themeSystem?.changePalette()" class="theme-text hover:theme-accent-text theme-transition" title="Change color palette">
+        <i data-lucide="palette" class="w-5 h-5"></i>
+      </button>
+      <button id="dark-mode-toggle" class="theme-text hover:theme-accent-text theme-transition" title="Toggle theme">
+        <i data-lucide="moon" class="w-6 h-6"></i>
+      </button>
+    </div>
   </div>
 </nav>

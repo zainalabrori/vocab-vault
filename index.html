@@ -1,6 +1,6 @@
 <!-- index.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,28 +9,51 @@
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  
+  <!-- Custom Theme CSS -->
+  <link rel="stylesheet" href="css/theme.css">
 
   <!-- JS -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="js/theme-system.js"></script>
   <script defer src="js/app.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="theme-bg theme-text theme-transition">
 
   <!-- Placeholders for injected components -->
   <div id="navbar"></div>
 
   <main class="p-4 max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-4">My Vocabulary List</h1>
+    <h1 class="text-3xl md:text-4xl font-bold mb-4">My Vocabulary List</h1>
 
-    <button onclick="openModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">+ Add New Word</button>
+    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+        <button onclick="openModal()" class="theme-button w-full md:w-auto soft-fade-in">+ Add New Word</button>
+        <div class="w-full md:w-auto flex items-center space-x-4">
+            <input type="text" id="search-input" placeholder="Search words..." class="theme-input w-full">
+            <select id="sort-select" class="theme-input">
+                <option value="date">Sort by Date</option>
+                <option value="alphabetical">Sort Alphabetically</option>
+            </select>
+        </div>
+    </div>
 
     <!-- Modal Placeholder -->
     <div id="modal"></div>
 
-    <div id="word-list" class="mt-6 grid gap-4 sm:grid-cols-2">
+    <div id="word-list" class="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       <!-- Word cards will go here -->
     </div>
+
+    <div id="pagination" class="mt-6 flex justify-center space-x-2"></div>
   </main>
+  
+  <!-- Theme indicator -->
+  <div id="theme-indicator" class="theme-indicator"></div>
 
 </body>
 </html>
