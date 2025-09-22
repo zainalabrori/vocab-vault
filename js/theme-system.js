@@ -12,7 +12,7 @@ class ThemeSystem {
                     name: 'ocean',
                     primary: '#e0f2fe',
                     secondary: '#b3e5fc',
-                    accent: '#4fc3f7',
+                    accent: '#0288d1',
                     text: '#0d47a1',
                     background: '#f8fdff'
                 },
@@ -20,7 +20,7 @@ class ThemeSystem {
                     name: 'sunset',
                     primary: '#fff3e0',
                     secondary: '#ffe0b2',
-                    accent: '#ffb74d',
+                    accent: '#f57500',
                     text: '#e65100',
                     background: '#fffcf8'
                 },
@@ -28,7 +28,7 @@ class ThemeSystem {
                     name: 'forest',
                     primary: '#e8f5e8',
                     secondary: '#c8e6c9',
-                    accent: '#81c784',
+                    accent: '#388e3c',
                     text: '#2e7d32',
                     background: '#f9fff9'
                 },
@@ -36,7 +36,7 @@ class ThemeSystem {
                     name: 'lavender',
                     primary: '#f3e5f5',
                     secondary: '#e1bee7',
-                    accent: '#ba68c8',
+                    accent: '#8e24aa',
                     text: '#6a1b9a',
                     background: '#fdfaff'
                 },
@@ -44,7 +44,7 @@ class ThemeSystem {
                     name: 'rose',
                     primary: '#fce4ec',
                     secondary: '#f8bbd9',
-                    accent: '#f06292',
+                    accent: '#d81b60',
                     text: '#c2185b',
                     background: '#fffafc'
                 }

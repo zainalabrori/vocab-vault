@@ -207,11 +207,39 @@
 @media (max-width: 768px) {
   .theme-card {
     box-shadow: 0 2px 4px var(--theme-secondary-20);
+    padding: 1.25rem; /* Increased padding for mobile */
   }
   
   .theme-card:hover {
     box-shadow: 0 4px 8px var(--theme-secondary-20);
     transform: translateY(-1px);
+  }
+  
+  /* Mobile typography improvements */
+  .theme-text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Better contrast for mobile */
+  .word-card .theme-text {
+    font-weight: 500; /* Slightly bolder text */
+  }
+  
+  /* Mobile-specific minimum font sizes */
+  .word-card h2 {
+    font-size: 1.375rem !important; /* 22px minimum for mobile */
+    line-height: 1.3;
+  }
+  
+  .word-card p {
+    font-size: 1rem !important; /* 16px minimum for mobile */
+    line-height: 1.6;
+  }
+  
+  /* Better spacing for mobile */
+  .word-card .space-y-3 > * + * {
+    margin-top: 1rem;
   }
 }
 
@@ -238,5 +266,70 @@
   
   .theme-button {
     border: 2px solid var(--theme-text);
+  }
+}
+
+/* Mobile-specific contrast improvements */
+@media (max-width: 768px) {
+  /* Increase opacity for better readability on mobile */
+  .word-card .theme-text.opacity-90 {
+    opacity: 0.95;
+  }
+  
+  .word-card .theme-text.opacity-75 {
+    opacity: 0.9;
+  }
+  
+  .word-card .theme-text.opacity-70 {
+    opacity: 0.85;
+  }
+  
+  /* Better background contrast for mobile */
+  .theme-card {
+    backdrop-filter: blur(2px);
+  }
+  
+  /* Improve example text visibility */
+  .word-card .italic {
+    font-style: normal;
+    font-weight: 600;
+    position: relative;
+  }
+  
+  .word-card .italic::before {
+    content: '💬 ';
+    opacity: 0.7;
+  }
+  
+  /* Mobile button improvements */
+  .word-card button {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+  }
+  
+  /* Always show action buttons on mobile for better UX */
+  .word-card button.sm\:block {
+    display: block;
+    opacity: 0.7;
+  }
+  
+  .word-card:active button.sm\:block,
+  .word-card.active button.sm\:block {
+    opacity: 1;
+  }
+  
+  /* Better text contrast on smaller screens */
+  .word-card .theme-accent-text {
+    font-weight: 600;
+  }
+  
+  /* Ensure minimum text size for accessibility */
+  .word-card span,
+  .word-card .text-sm {
+    font-size: 0.875rem !important; /* 14px minimum */
+  }
+  
+  .word-card .text-xs {
+    font-size: 0.8125rem !important; /* 13px minimum */
   }
 }

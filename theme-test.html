@@ -40,27 +40,35 @@
   <div class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-bold mb-6 theme-text">Theme System Test</h1>
     
-    <!-- Test Cards -->
+    <!-- Test Cards - Mobile Readability Test -->
     <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-      <div class="theme-card p-4">
-        <h2 class="text-xl font-bold theme-text mb-2">Test Card 1</h2>
-        <p class="theme-text opacity-90 mb-2">This is a test card to verify theme styling.</p>
-        <button class="theme-button">Test Button</button>
+      <!-- Vocabulary Card Test -->
+      <div class="word-card relative theme-card p-4 soft-fade-in cursor-pointer group">
+        <h2 class="text-xl md:text-2xl font-bold theme-text mb-2">Serendipity</h2>
+        <span class="inline-block text-sm theme-accent-bg px-3 py-1 rounded-full font-semibold" style="color: var(--theme-background);">noun</span>
+        
+        <div class="mt-4 space-y-3">
+          <p class="text-base md:text-sm theme-text leading-relaxed">The occurrence of events by chance in a happy or beneficial way.</p>
+          <div class="bg-gradient-to-r from-transparent via-current to-transparent opacity-20 h-px"></div>
+          <p class="text-base md:text-sm theme-text font-medium leading-relaxed">
+            <span class="theme-accent-text opacity-75 text-sm">Example:</span><br>
+            <span class="italic">"It was pure serendipity that led me to find the perfect book."</span>
+          </p>
+        </div>
+        
+        <p class="text-right text-sm theme-text opacity-75 mt-4 font-medium">Today</p>
       </div>
       
       <div class="theme-card p-4">
-        <h2 class="text-xl font-bold theme-text mb-2">Test Card 2</h2>
-        <p class="theme-text opacity-90 mb-2">Another card with theme styling.</p>
+        <h2 class="text-xl font-bold theme-text mb-2">Mobile Test</h2>
+        <p class="theme-text opacity-90 mb-2">Testing mobile readability improvements.</p>
         <input type="text" placeholder="Test input" class="theme-input w-full">
       </div>
       
       <div class="theme-card p-4">
-        <h2 class="text-xl font-bold theme-text mb-2">Test Card 3</h2>
-        <p class="theme-text opacity-90 mb-2">Third card for testing.</p>
-        <select class="theme-input w-full">
-          <option>Test Option 1</option>
-          <option>Test Option 2</option>
-        </select>
+        <h2 class="text-xl font-bold theme-text mb-2">Typography Test</h2>
+        <p class="text-base theme-text leading-relaxed mb-2">This text should be clearly readable on mobile devices with proper contrast and sizing.</p>
+        <p class="text-sm theme-text opacity-75 italic">Even smaller italic text should be legible.</p>
       </div>
     </div>
     
