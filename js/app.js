@@ -21,21 +21,58 @@ async function fetchAPI(url, options) {
 }
 
 async function loadComponent(id, path) {
-    const res = await fetch(path);
-    const html = await res.text();
-    document.getElementById(id).innerHTML = html;
-    if (id === "modal") {
-        bindFormEvents();
+    try {
+        const res = await fetch(path);
+        if (!res.ok) {
+            throw new Error(`Failed to load ${path}: ${res.status}`);
+        }
+        const html = await res.text();
+        const element = document.getElementById(id);
+        if (element) {
+            element.innerHTML = html;
+            if (id === "modal") {
+                bindFormEvents();
+            }
+        }
+    } catch (error) {
+        console.error(`Error loading component ${id} from ${path}:`, error);
     }
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
-    loadComponent("navbar", "components/navbar.html");
-    loadComponent("modal", "components/add-word-form.html");
-    wordCardTemplate = await fetch("components/word-card.html").then(res => res.text());
-    await loadWords();
-    document.getElementById("search-input").addEventListener("input", handleSearch);
-    document.getElementById("sort-select").addEventListener("change", handleSort);
+    try {
+        // Load components first
+        await loadComponent("navbar", "components/navbar.html");
+        await loadComponent("modal", "components/add-word-form.html");
+        
+        // Notify that components are loaded
+        document.dispatchEvent(new CustomEvent('componentsLoaded'));
+        
+        // Load word card template
+        wordCardTemplate = await fetch("components/word-card.html").then(res => res.text());
+        
+        // Load data
+        await loadWords();
+        
+        // Bind events with error handling
+        const searchInput = document.getElementById("search-input");
+        const sortSelect = document.getElementById("sort-select");
+        
+        if (searchInput) {
+            searchInput.addEventListener("input", handleSearch);
+        }
+        if (sortSelect) {
+            sortSelect.addEventListener("change", handleSort);
+        }
+        
+        // Ensure Lucide icons are rendered
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        
+    } catch (error) {
+        console.error('Error initializing app:', error);
+    }
 });
 
 function openModal() {

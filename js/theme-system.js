@@ -106,9 +106,17 @@ class ThemeSystem {
         } else {
             this.setupTheme();
         }
+        
+        // Also listen for components loaded event
+        document.addEventListener('componentsLoaded', () => {
+            this.bindToggleButton();
+            this.updateToggleButton();
+        });
     }
     
     setupTheme() {
+        console.log('Setting up theme system...');
+        
         // Get saved theme preference or default to dark
         const savedTheme = localStorage.getItem('vocab-vault-theme') || 'dark';
         const savedPalette = localStorage.getItem('vocab-vault-palette');
@@ -119,15 +127,20 @@ class ThemeSystem {
         if (savedPalette) {
             try {
                 this.currentPalette = JSON.parse(savedPalette);
+                console.log('Loaded saved palette:', this.currentPalette.name);
             } catch (e) {
+                console.log('Failed to parse saved palette, generating new one');
                 this.setRandomPalette();
             }
         } else {
+            console.log('No saved palette, generating new one');
             this.setRandomPalette();
         }
         
         this.applyTheme();
         this.bindToggleButton();
+        
+        console.log('Theme setup complete:', this.currentTheme, this.currentPalette.name);
     }
     
     setRandomPalette() {
@@ -166,28 +179,60 @@ class ThemeSystem {
     }
     
     updateToggleButton() {
-        this.toggleButton = document.getElementById('dark-mode-toggle');
-        if (this.toggleButton) {
-            const icon = this.currentTheme === 'dark' ? 'sun' : 'moon';
-            const tooltip = this.currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+        // Try multiple times to find the button (for async component loading)
+        const tryUpdateButton = (attempts = 0) => {
+            this.toggleButton = document.getElementById('dark-mode-toggle');
             
-            this.toggleButton.innerHTML = `<i data-lucide="${icon}" class="w-6 h-6"></i>`;
-            this.toggleButton.setAttribute('title', tooltip);
-            
-            // Recreate icons
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+            if (this.toggleButton) {
+                const icon = this.currentTheme === 'dark' ? 'sun' : 'moon';
+                const tooltip = this.currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+                
+                this.toggleButton.innerHTML = `<i data-lucide="${icon}" class="w-6 h-6"></i>`;
+                this.toggleButton.setAttribute('title', tooltip);
+                
+                // Recreate icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            } else if (attempts < 5) {
+                // Retry after a short delay if button not found
+                setTimeout(() => tryUpdateButton(attempts + 1), 100);
             }
-        }
+        };
+        
+        tryUpdateButton();
     }
     
     bindToggleButton() {
-        // Use event delegation since button might not exist yet
+        // Use event delegation for better mobile compatibility
         document.addEventListener('click', (e) => {
-            if (e.target.closest('#dark-mode-toggle')) {
+            const toggleButton = e.target.closest('#dark-mode-toggle');
+            const paletteButton = e.target.closest('#palette-toggle');
+            
+            if (toggleButton) {
+                e.preventDefault();
+                e.stopPropagation();
                 this.toggleTheme();
+            } else if (paletteButton) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.changePalette();
             }
         });
+        
+        // Add touch event support for mobile
+        document.addEventListener('touchend', (e) => {
+            const toggleButton = e.target.closest('#dark-mode-toggle');
+            const paletteButton = e.target.closest('#palette-toggle');
+            
+            if (toggleButton) {
+                e.preventDefault();
+                this.toggleTheme();
+            } else if (paletteButton) {
+                e.preventDefault();
+                this.changePalette();
+            }
+        }, { passive: false });
     }
     
     toggleTheme() {
@@ -235,10 +280,28 @@ class ThemeSystem {
 }
 
 // Initialize theme system
-const themeSystem = new ThemeSystem();
+let themeSystem;
 
-// Make it globally available
-window.themeSystem = themeSystem;
+// Initialize with proper error handling
+try {
+    themeSystem = new ThemeSystem();
+    // Make it globally available
+    window.themeSystem = themeSystem;
+    
+    // Add some debug logging for mobile
+    console.log('Theme system initialized successfully');
+} catch (error) {
+    console.error('Failed to initialize theme system:', error);
+    // Fallback for basic functionality
+    window.themeSystem = {
+        toggleTheme: () => {
+            document.documentElement.classList.toggle('dark');
+        },
+        changePalette: () => {
+            console.log('Palette change not available in fallback mode');
+        }
+    };
+}
 
 // Additional initialization for Lucide icons
 document.addEventListener('DOMContentLoaded', () => {

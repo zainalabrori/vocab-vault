@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Theme System Test</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  
+  <!-- Custom Theme CSS -->
+  <link rel="stylesheet" href="css/theme.css">
+  
+  <!-- JS -->
+  <script defer src="js/theme-system.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="theme-bg theme-text theme-transition p-8">
+  
+  <!-- Test Navigation -->
+  <nav class="theme-nav theme-transition shadow-md px-4 py-3 mb-6 rounded">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <span class="text-xl font-semibold theme-accent-text">Theme System Test</span>
+      <div class="flex items-center space-x-4">
+        <button id="palette-toggle" class="theme-text hover:theme-accent-text theme-transition" title="Change color palette" type="button">
+          <i data-lucide="palette" class="w-5 h-5"></i>
+        </button>
+        <button id="dark-mode-toggle" class="theme-text hover:theme-accent-text theme-transition" title="Toggle theme" type="button">
+          <i data-lucide="moon" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 theme-text">Theme System Test</h1>
+    
+    <!-- Test Cards -->
+    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+      <div class="theme-card p-4">
+        <h2 class="text-xl font-bold theme-text mb-2">Test Card 1</h2>
+        <p class="theme-text opacity-90 mb-2">This is a test card to verify theme styling.</p>
+        <button class="theme-button">Test Button</button>
+      </div>
+      
+      <div class="theme-card p-4">
+        <h2 class="text-xl font-bold theme-text mb-2">Test Card 2</h2>
+        <p class="theme-text opacity-90 mb-2">Another card with theme styling.</p>
+        <input type="text" placeholder="Test input" class="theme-input w-full">
+      </div>
+      
+      <div class="theme-card p-4">
+        <h2 class="text-xl font-bold theme-text mb-2">Test Card 3</h2>
+        <p class="theme-text opacity-90 mb-2">Third card for testing.</p>
+        <select class="theme-input w-full">
+          <option>Test Option 1</option>
+          <option>Test Option 2</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Test Instructions -->
+    <div class="theme-card p-6">
+      <h2 class="text-2xl font-bold theme-text mb-4">Test Instructions</h2>
+      <div class="theme-text space-y-2">
+        <p>• Click the <strong>moon/sun icon</strong> to toggle between dark and light modes</p>
+        <p>• Click the <strong>palette icon</strong> to change color schemes</p>
+        <p>• Test on both desktop and mobile devices</p>
+        <p>• Check that buttons respond to touch on mobile</p>
+        <p>• Verify smooth transitions between themes</p>
+        <p>• Check browser console for any errors</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme indicator -->
+  <div id="theme-indicator" class="theme-indicator"></div>
+
+  <!-- Debug Info -->
+  <div class="fixed bottom-4 left-4 theme-card p-3 text-sm opacity-75">
+    <div>Theme System Status:</div>
+    <div id="debug-info" class="theme-text">Loading...</div>
+  </div>
+
+  <script>
+    // Debug information
+    document.addEventListener('DOMContentLoaded', () => {
+      const debugInfo = document.getElementById('debug-info');
+      
+      const updateDebugInfo = () => {
+        if (window.themeSystem) {
+          const currentTheme = window.themeSystem.getCurrentTheme();
+          debugInfo.innerHTML = `
+            <div>Mode: ${currentTheme.theme}</div>
+            <div>Palette: ${currentTheme.palette ? currentTheme.palette.name : 'Loading...'}</div>
+            <div>Status: Ready</div>
+          `;
+        } else {
+          debugInfo.innerHTML = '<div>Status: Theme system not loaded</div>';
+        }
+      };
+      
+      // Update debug info periodically
+      setInterval(updateDebugInfo, 1000);
+      updateDebugInfo();
+      
+      // Listen for theme changes
+      document.addEventListener('themeChanged', updateDebugInfo);
+    });
+  </script>
+</body>
+</html>

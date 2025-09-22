@@ -14,13 +14,13 @@
   --theme-error: #f44336;
   --theme-info: #2196f3;
   
-  /* Opacity variants */
-  --theme-primary-10: rgba(from var(--theme-primary) r g b / 0.1);
-  --theme-primary-20: rgba(from var(--theme-primary) r g b / 0.2);
-  --theme-secondary-10: rgba(from var(--theme-secondary) r g b / 0.1);
-  --theme-secondary-20: rgba(from var(--theme-secondary) r g b / 0.2);
-  --theme-accent-10: rgba(from var(--theme-accent) r g b / 0.1);
-  --theme-accent-20: rgba(from var(--theme-accent) r g b / 0.2);
+  /* Opacity variants - with fallbacks for better browser support */
+  --theme-primary-10: rgba(26, 35, 50, 0.1);
+  --theme-primary-20: rgba(26, 35, 50, 0.2);
+  --theme-secondary-10: rgba(42, 52, 65, 0.1);
+  --theme-secondary-20: rgba(42, 52, 65, 0.2);
+  --theme-accent-10: rgba(74, 144, 226, 0.1);
+  --theme-accent-20: rgba(74, 144, 226, 0.2);
 }
 
 /* Theme-aware components */
