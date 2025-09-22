@@ -7,15 +7,17 @@
       </button>
     </div>
     <form id="add-word-form" class="space-y-4">
-      <input required type="text" placeholder="Word" class="theme-input w-full" />
-      <input required type="text" placeholder="Definition" class="theme-input w-full" />
-      <input required type="text" placeholder="Example Sentence" class="theme-input w-full" />
-      <select required class="theme-input w-full">
-        <option value="" class="theme-text">Select Type</option>
-        <option value="noun" class="theme-text">Noun</option>
-        <option value="verb" class="theme-text">Verb</option>
-        <option value="adjective" class="theme-text">Adjective</option>
-        <option value="adverb" class="theme-text">Adverb</option>
+      <input id="word-input" name="word" required type="text" placeholder="Word" class="theme-input w-full" />
+      <input id="definition-input" name="definition" required type="text" placeholder="Definition" class="theme-input w-full" />
+      <input id="example-input" name="example" required type="text" placeholder="Example Sentence" class="theme-input w-full" />
+      <select id="type-select" name="type" required class="theme-input w-full">
+        <option value="">Select Type</option>
+        <option value="noun">Noun</option>
+        <option value="verb">Verb</option>
+        <option value="adjective">Adjective</option>
+        <option value="adverb">Adverb</option>
+        <option value="preposition">Preposition</option>
+        <option value="conjunction">Conjunction</option>
       </select>
       <div class="flex gap-2 pt-2">
         <button id="submitBtn" type="submit" class="theme-button flex-1">Add Word</button>

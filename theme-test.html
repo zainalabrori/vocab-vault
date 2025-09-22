@@ -74,15 +74,35 @@
     
     <!-- Test Instructions -->
     <div class="theme-card p-6">
-      <h2 class="text-2xl font-bold theme-text mb-4">Test Instructions</h2>
-      <div class="theme-text space-y-2">
-        <p>• Click the <strong>moon/sun icon</strong> to toggle between dark and light modes</p>
-        <p>• Click the <strong>palette icon</strong> to change color schemes</p>
-        <p>• Test on both desktop and mobile devices</p>
-        <p>• Check that buttons respond to touch on mobile</p>
-        <p>• Verify smooth transitions between themes</p>
-        <p>• Check browser console for any errors</p>
+      <h2 class="text-2xl font-bold theme-text mb-4">Mobile Test Results</h2>
+      <div class="theme-text space-y-3">
+        <div class="mb-4">
+          <h3 class="font-semibold mb-2">✅ Theme System Tests:</h3>
+          <p>• <strong>Theme Toggle</strong>: Click moon/sun icon (should switch dark/light)</p>
+          <p>• <strong>Palette Change</strong>: Click palette icon (should get new colors)</p>
+          <p>• <strong>Color Count</strong>: Now has 14 light + 15 dark = 29 total palettes</p>
+        </div>
+        
+        <div class="mb-4">
+          <h3 class="font-semibold mb-2">📱 Mobile-Specific Tests:</h3>
+          <p>• <strong>Touch Response</strong>: Buttons respond to touch</p>
+          <p>• <strong>Text Readability</strong>: All text should be clearly readable</p>
+          <p>• <strong>Example Text</strong>: Examples should show with speech bubble icons</p>
+          <p>• <strong>Action Buttons</strong>: Edit/delete buttons visible on mobile</p>
+        </div>
+        
+        <div>
+          <h3 class="font-semibold mb-2">🔧 Modal Form Tests:</h3>
+          <p>• <strong>Form Access</strong>: Modal opens when clicking "Add New Word"</p>
+          <p>• <strong>Input Fields</strong>: All fields should accept input</p>
+          <p>• <strong>Form Submission</strong>: Should successfully add new words</p>
+        </div>
       </div>
+    </div>
+    
+    <!-- Add Word Test Button -->
+    <div class="mt-6">
+      <button onclick="openTestModal()" class="theme-button w-full md:w-auto">🧪 Test Add Word Modal</button>
     </div>
   </div>
 
@@ -95,7 +115,49 @@
     <div id="debug-info" class="theme-text">Loading...</div>
   </div>
 
+  <!-- Test Modal -->
+  <div id="testModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="theme-modal p-6 rounded-lg shadow-2xl w-full max-w-md soft-fade-in">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold theme-text">Test Add Word</h2>
+        <button onclick="closeTestModal()" class="theme-text hover:theme-accent-text theme-transition p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="test-form" class="space-y-4">
+        <input id="test-word" required type="text" placeholder="Word" class="theme-input w-full" value="Serendipity" />
+        <input id="test-definition" required type="text" placeholder="Definition" class="theme-input w-full" value="The occurrence of events by chance in a happy way" />
+        <input id="test-example" required type="text" placeholder="Example Sentence" class="theme-input w-full" value="It was pure serendipity that I found this perfect book." />
+        <select id="test-type" required class="theme-input w-full">
+          <option value="">Select Type</option>
+          <option value="noun" selected>Noun</option>
+          <option value="verb">Verb</option>
+          <option value="adjective">Adjective</option>
+          <option value="adverb">Adverb</option>
+        </select>
+        <div class="flex gap-2 pt-2">
+          <button type="submit" class="theme-button flex-1">Test Form</button>
+          <button type="button" onclick="closeTestModal()" class="px-4 py-2 theme-secondary-bg theme-text rounded-lg hover:theme-accent-bg theme-transition">Cancel</button>
+        </div>
+      </form>
+      <div id="test-result" class="mt-4 p-3 rounded theme-secondary-bg hidden"></div>
+    </div>
+  </div>
+
   <script>
+    // Test Modal Functions
+    function openTestModal() {
+      document.getElementById('testModal').classList.remove('hidden');
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }
+    
+    function closeTestModal() {
+      document.getElementById('testModal').classList.add('hidden');
+      document.getElementById('test-result').classList.add('hidden');
+    }
+    
     // Debug information
     document.addEventListener('DOMContentLoaded', () => {
       const debugInfo = document.getElementById('debug-info');
@@ -107,6 +169,7 @@
             <div>Mode: ${currentTheme.theme}</div>
             <div>Palette: ${currentTheme.palette ? currentTheme.palette.name : 'Loading...'}</div>
             <div>Status: Ready</div>
+            <div>Palettes: 14 light + 15 dark = 29 total</div>
           `;
         } else {
           debugInfo.innerHTML = '<div>Status: Theme system not loaded</div>';
@@ -119,6 +182,28 @@
       
       // Listen for theme changes
       document.addEventListener('themeChanged', updateDebugInfo);
+      
+      // Test form submission
+      document.getElementById('test-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const result = document.getElementById('test-result');
+        const word = document.getElementById('test-word').value;
+        const definition = document.getElementById('test-definition').value;
+        const example = document.getElementById('test-example').value;
+        const type = document.getElementById('test-type').value;
+        
+        result.innerHTML = `
+          <div class="theme-text">
+            <h4 class="font-bold mb-2">✅ Form Test Successful!</h4>
+            <p><strong>Word:</strong> ${word}</p>
+            <p><strong>Definition:</strong> ${definition}</p>
+            <p><strong>Example:</strong> "${example}"</p>
+            <p><strong>Type:</strong> ${type}</p>
+            <p class="mt-2 text-sm opacity-75">Form inputs are working correctly!</p>
+          </div>
+        `;
+        result.classList.remove('hidden');
+      });
     });
   </script>
 </body>

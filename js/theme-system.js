@@ -47,6 +47,78 @@ class ThemeSystem {
                     accent: '#d81b60',
                     text: '#c2185b',
                     background: '#fffafc'
+                },
+                {
+                    name: 'mint',
+                    primary: '#e0f7f7',
+                    secondary: '#b2dfdc',
+                    accent: '#00695c',
+                    text: '#004d40',
+                    background: '#f0fffe'
+                },
+                {
+                    name: 'peach',
+                    primary: '#ffeee6',
+                    secondary: '#ffccbc',
+                    accent: '#d84315',
+                    text: '#bf360c',
+                    background: '#fff8f5'
+                },
+                {
+                    name: 'sky',
+                    primary: '#e3f2fd',
+                    secondary: '#bbdefb',
+                    accent: '#1976d2',
+                    text: '#0d47a1',
+                    background: '#f3f9ff'
+                },
+                {
+                    name: 'coral',
+                    primary: '#fef5f3',
+                    secondary: '#ffcccb',
+                    accent: '#e57373',
+                    text: '#c62828',
+                    background: '#fffafa'
+                },
+                {
+                    name: 'sage',
+                    primary: '#f1f8e9',
+                    secondary: '#dcedc8',
+                    accent: '#689f38',
+                    text: '#33691e',
+                    background: '#f9fbe7'
+                },
+                {
+                    name: 'gold',
+                    primary: '#fffde7',
+                    secondary: '#fff9c4',
+                    accent: '#f57f17',
+                    text: '#f57f17',
+                    background: '#fffef7'
+                },
+                {
+                    name: 'violet',
+                    primary: '#f8e8ff',
+                    secondary: '#e1bee7',
+                    accent: '#7b1fa2',
+                    text: '#4a148c',
+                    background: '#faf4ff'
+                },
+                {
+                    name: 'teal',
+                    primary: '#e0f2f1',
+                    secondary: '#b2dfdb',
+                    accent: '#00796b',
+                    text: '#004d40',
+                    background: '#f0fdfc'
+                },
+                {
+                    name: 'amber',
+                    primary: '#fff8e1',
+                    secondary: '#ffecb3',
+                    accent: '#ff8f00',
+                    text: '#e65100',
+                    background: '#fffdf7'
                 }
             ],
             dark: [
@@ -89,6 +161,86 @@ class ThemeSystem {
                     accent: '#e91e63',
                     text: '#fce4ec',
                     background: '#1a0d12'
+                },
+                {
+                    name: 'cosmic',
+                    primary: '#1a1a2e',
+                    secondary: '#2a2a4e',
+                    accent: '#7209b7',
+                    text: '#eeeeff',
+                    background: '#0f0f1e'
+                },
+                {
+                    name: 'volcanic',
+                    primary: '#2b1c1c',
+                    secondary: '#3d2c2c',
+                    accent: '#ff6b35',
+                    text: '#ffe4e1',
+                    background: '#1a1111'
+                },
+                {
+                    name: 'ocean-depth',
+                    primary: '#1b2838',
+                    secondary: '#2b3848',
+                    accent: '#26c6da',
+                    text: '#e0f4ff',
+                    background: '#0d1821'
+                },
+                {
+                    name: 'cherry-noir',
+                    primary: '#2d1b23',
+                    secondary: '#3d2b33',
+                    accent: '#e91e63',
+                    text: '#ffebf0',
+                    background: '#1a0d15'
+                },
+                {
+                    name: 'emerald-night',
+                    primary: '#1a2d1a',
+                    secondary: '#2a3d2a',
+                    accent: '#4caf50',
+                    text: '#e8f5e8',
+                    background: '#0d1a0d'
+                },
+                {
+                    name: 'golden-shadow',
+                    primary: '#2d261a',
+                    secondary: '#3d362a',
+                    accent: '#ffc107',
+                    text: '#fff8e1',
+                    background: '#1a1711'
+                },
+                {
+                    name: 'royal-purple',
+                    primary: '#2a1a2a',
+                    secondary: '#3a2a3a',
+                    accent: '#9c27b0',
+                    text: '#f3e5f5',
+                    background: '#1a0f1a'
+                },
+                {
+                    name: 'steel-blue',
+                    primary: '#1e2832',
+                    secondary: '#2e3842',
+                    accent: '#607d8b',
+                    text: '#eceff1',
+                    background: '#0e1419'
+                },
+                {
+                    name: 'copper-glow',
+                    primary: '#2d231a',
+                    secondary: '#3d332a',
+                    accent: '#ff8f00',
+                    text: '#fff3e0',
+                    background: '#1a1511'
+                },
+                {
+                    name: 'arctic-night',
+                    primary: '#1a252d',
+                    secondary: '#2a353d',
+                    accent: '#00bcd4',
+                    text: '#e0f2f1',
+                    background: '#0d1619'
                 }
             ]
         };
