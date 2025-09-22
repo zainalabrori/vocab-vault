@@ -1,5 +1,8 @@
 // js/app.js
-const API_URL = "http://localhost:3000/api/words";
+// Dynamic API URL - works for both localhost and deployment
+const API_URL = window.location.hostname === 'localhost' ? 
+    "http://localhost:3000/api/words" : 
+    "/api/words";
 let wordCardTemplate = "";
 let editingWordId = null;
 let allWords = [];
@@ -98,71 +101,182 @@ function closeModal() {
 }
 
 function bindFormEvents() {
-    const form = document.getElementById("add-word-form");
-    if (!form) {
-        console.log('Form not found, retrying...');
-        setTimeout(bindFormEvents, 100);
-        return;
-    }
-    
-    console.log('Binding form events...');
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        
-        // Get form inputs by ID for reliability
-        const wordInput = document.getElementById('word-input');
-        const defInput = document.getElementById('definition-input');
-        const exampleInput = document.getElementById('example-input');
-        const typeSelect = document.getElementById('type-select');
-        
-        if (!wordInput || !defInput || !exampleInput || !typeSelect) {
-            console.error('Form inputs not found');
+    // Use multiple approaches to ensure form binding works
+    const bindForm = () => {
+        const form = document.getElementById("add-word-form");
+        if (!form) {
+            console.log('Form not found, retrying in 500ms...');
+            setTimeout(bindForm, 500);
             return;
         }
         
-        const wordData = {
-            text: wordInput.value.trim(),
-            definition: defInput.value.trim(),
-            example: exampleInput.value.trim(),
-            type: typeSelect.value,
-        };
+        console.log('Form found, binding events...');
         
-        console.log('Submitting word data:', wordData);
+        // Remove any existing event listeners
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        newForm.addEventListener("submit", handleFormSubmit);
+        console.log('Form events bound successfully');
+    };
+    
+    bindForm();
+}
 
-        const url = editingWordId ? `${API_URL}/${editingWordId}` : API_URL;
-        const method = editingWordId ? "PUT" : "POST";
-
-        try {
-            await fetchAPI(url, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(wordData),
-            });
-
-            await loadWords();
-            closeModal();
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to save word. Please try again.');
-        }
+// Separate form submission handler
+async function handleFormSubmit(e) {
+    e.preventDefault();
+    console.log('Form submitted!');
+    
+    // Get form inputs by ID for reliability
+    const wordInput = document.getElementById('word-input');
+    const defInput = document.getElementById('definition-input');
+    const exampleInput = document.getElementById('example-input');
+    const typeSelect = document.getElementById('type-select');
+    
+    console.log('Form inputs found:', {
+        word: !!wordInput,
+        def: !!defInput, 
+        example: !!exampleInput,
+        type: !!typeSelect
     });
+    
+    if (!wordInput || !defInput || !exampleInput || !typeSelect) {
+        console.error('Form inputs not found');
+        alert('Form inputs not found. Please try again.');
+        return;
+    }
+    
+    const wordData = {
+        text: wordInput.value.trim(),
+        definition: defInput.value.trim(),
+        example: exampleInput.value.trim(),
+        type: typeSelect.value,
+    };
+    
+    console.log('Submitting word data:', wordData);
+    
+    // Validation
+    if (!wordData.text || !wordData.definition || !wordData.example || !wordData.type) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    const url = editingWordId ? `${API_URL}/${editingWordId}` : API_URL;
+    const method = editingWordId ? "PUT" : "POST";
+    
+    console.log(`Making ${method} request to:`, url);
+
+    try {
+        const result = await fetchAPI(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(wordData),
+        });
+        
+        console.log('API response:', result);
+        await loadWords();
+        closeModal();
+        alert(`Word ${editingWordId ? 'updated' : 'added'} successfully!`);
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert(`Failed to ${editingWordId ? 'update' : 'save'} word: ${error.message}`);
+    }
 }
 
 async function loadWords() {
-    allWords = await fetchAPI(API_URL);
-    renderWords(allWords);
+    console.log('Loading words from:', API_URL);
+    try {
+        allWords = await fetchAPI(API_URL);
+        console.log('Loaded words:', allWords);
+        if (!allWords || !Array.isArray(allWords)) {
+            console.error('Invalid words data returned from API');
+            // Try to load from local storage as fallback
+            const localWords = localStorage.getItem('vocab-words');
+            if (localWords) {
+                allWords = JSON.parse(localWords);
+                console.log('Loaded words from localStorage:', allWords);
+            } else {
+                // If no API and no local storage, use sample data
+                allWords = [
+                    {
+                        id: 1,
+                        text: "Ephemeral",
+                        definition: "Lasting for a very short time.",
+                        example: "The beauty of the cherry blossoms is ephemeral.",
+                        type: "adjective",
+                        date: "15 Jul 2023"
+                    },
+                    {
+                        id: 2,
+                        text: "Ubiquitous",
+                        definition: "Present, appearing, or found everywhere.",
+                        example: "Mobile phones are now ubiquitous.",
+                        type: "adjective",
+                        date: "16 Jul 2023"
+                    }
+                ];
+                console.log('Using sample data');
+            }
+        }
+        renderWords(allWords);
+    } catch (error) {
+        console.error('Failed to load words:', error);
+        // Fallback to sample data
+        allWords = [
+            {
+                id: 1,
+                text: "Ephemeral",
+                definition: "Lasting for a very short time.",
+                example: "The beauty of the cherry blossoms is ephemeral.",
+                type: "adjective",
+                date: "15 Jul 2023"
+            },
+            {
+                id: 2,
+                text: "Ubiquitous",
+                definition: "Present, appearing, or found everywhere.",
+                example: "Mobile phones are now ubiquitous.",
+                type: "adjective",
+                date: "16 Jul 2023"
+            }
+        ];
+        renderWords(allWords);
+    }
 }
 
 function renderWords(words) {
+    console.log('Rendering words:', words);
     const list = document.getElementById("word-list");
+    if (!list) {
+        console.error('Word list container not found');
+        return;
+    }
+    
     list.innerHTML = "";
+    
+    if (!words || words.length === 0) {
+        list.innerHTML = '<div class="theme-card p-6 col-span-full text-center"><p class="theme-text">No words found. Add some vocabulary!</p></div>';
+        return;
+    }
+    
     const paginatedWords = words.slice((currentPage - 1) * wordsPerPage, currentPage * wordsPerPage);
+    console.log('Paginated words for rendering:', paginatedWords);
+    
     paginatedWords.forEach((word, index) => {
         const card = createWordCard(word, index);
-        list.appendChild(card);
+        if (card) {
+            list.appendChild(card);
+        } else {
+            console.error('Failed to create card for word:', word);
+        }
     });
     renderPagination(words.length);
-    lucide.createIcons();
+    
+    // Ensure icons are rendered
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 function createWordCard(word, index) {
@@ -171,7 +285,7 @@ function createWordCard(word, index) {
     
     // Ensure all fields exist with fallbacks
     const wordData = {
-        id: word.id || 'unknown',
+        id: word.id || Date.now(),
         text: word.text || 'No word',
         type: word.type || 'unknown',
         definition: word.definition || 'No definition available',
@@ -179,14 +293,43 @@ function createWordCard(word, index) {
         date: word.date || 'Unknown date'
     };
     
-    const cardHTML = wordCardTemplate
-        .replace(/{{id}}/g, wordData.id)
-        .replace(/{{word}}/g, wordData.text)
-        .replace(/{{type}}/g, wordData.type)
-        .replace(/{{definition}}/g, wordData.definition)
-        .replace(/{{example}}/g, wordData.example)
-        .replace(/{{date}}/g, wordData.date)
-        .replace(/{{bgColor}}/g, ""); // Remove bgColor placeholder
+    let cardHTML;
+    
+    // Use template if available, otherwise use fallback
+    if (wordCardTemplate && wordCardTemplate.includes('{{word}}')) {
+        cardHTML = wordCardTemplate
+            .replace(/{{id}}/g, wordData.id)
+            .replace(/{{word}}/g, wordData.text)
+            .replace(/{{type}}/g, wordData.type)
+            .replace(/{{definition}}/g, wordData.definition)
+            .replace(/{{example}}/g, wordData.example)
+            .replace(/{{date}}/g, wordData.date)
+            .replace(/{{bgColor}}/g, "");
+    } else {
+        // Fallback template if main template fails
+        console.warn('Using fallback card template');
+        cardHTML = `
+            <div class="word-card relative theme-card p-4 soft-fade-in cursor-pointer group">
+                <button onclick="editWord('${wordData.id}')" class="absolute top-3 right-12 p-2 theme-secondary-bg rounded-full shadow-sm hidden group-hover:block md:group-hover:block sm:block theme-transition hover:theme-accent-bg" title="Edit word">
+                    <i data-lucide="pencil" class="w-4 h-4 theme-text"></i>
+                </button>
+                <button onclick="deleteWord('${wordData.id}')" class="absolute top-3 right-2 p-2 theme-secondary-bg rounded-full shadow-sm hidden group-hover:block md:group-hover:block sm:block theme-transition hover:bg-red-500" title="Delete word">
+                    <i data-lucide="trash-2" class="w-4 h-4 text-red-400 hover:text-white"></i>
+                </button>
+                <h2 class="text-xl md:text-2xl font-bold theme-text mb-2">${wordData.text}</h2>
+                <span class="inline-block text-sm theme-accent-bg px-3 py-1 rounded-full font-semibold" style="color: var(--theme-background);">${wordData.type}</span>
+                <div class="mt-4 space-y-3">
+                    <p class="text-base md:text-sm theme-text leading-relaxed">${wordData.definition}</p>
+                    <div class="bg-gradient-to-r from-transparent via-current to-transparent opacity-20 h-px"></div>
+                    <p class="text-base md:text-sm theme-text font-medium leading-relaxed">
+                        <span class="theme-accent-text opacity-75 text-sm">Example:</span><br>
+                        <span class="italic">"${wordData.example}"</span>
+                    </p>
+                </div>
+                <p class="text-right text-sm theme-text opacity-75 mt-4 font-medium">${wordData.date}</p>
+            </div>
+        `;
+    }
     
     const card = document.createElement("div");
     card.innerHTML = cardHTML;
@@ -195,6 +338,10 @@ function createWordCard(word, index) {
     const cardElement = card.firstElementChild;
     if (cardElement) {
         cardElement.style.animationDelay = `${index * 0.1}s`;
+        
+        // Debug: Check if example is present in the rendered HTML
+        const exampleSpan = cardElement.querySelector('.italic');
+        console.log('Example element found:', !!exampleSpan, exampleSpan?.textContent);
     }
     
     return cardElement;

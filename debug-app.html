@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vocab Vault - Debug Mode</title>
+  <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  
+  <!-- Custom Theme CSS -->
+  <link rel="stylesheet" href="css/theme.css">
+
+  <!-- JS -->
+  <script defer src="js/theme-system.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="theme-bg theme-text theme-transition">
+
+  <!-- Debug Navbar -->
+  <nav class="theme-nav theme-transition shadow-md px-4 py-3">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <span class="text-xl font-semibold theme-accent-text">Vocab Vault - Debug</span>
+      <div class="flex items-center space-x-4">
+        <button id="palette-toggle" class="theme-text hover:theme-accent-text theme-transition" title="Change color palette" type="button">
+          <i data-lucide="palette" class="w-5 h-5"></i>
+        </button>
+        <button id="dark-mode-toggle" class="theme-text hover:theme-accent-text theme-transition" title="Toggle theme" type="button">
+          <i data-lucide="moon" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="p-4 max-w-4xl mx-auto">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4">Vocab Vault Debug</h1>
+
+    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+        <button onclick="openModal()" class="theme-button w-full md:w-auto soft-fade-in">+ Add New Word</button>
+        <div class="w-full md:w-auto flex items-center space-x-4">
+            <input type="text" id="search-input" placeholder="Search words..." class="theme-input w-full">
+            <select id="sort-select" class="theme-input">
+                <option value="date">Sort by Date</option>
+                <option value="alphabetical">Sort Alphabetically</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Debug Modal -->
+    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+      <div class="theme-modal p-6 rounded-lg shadow-2xl w-full max-w-md soft-fade-in">
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="modalTitle" class="text-xl font-bold theme-text">Add New Word</h2>
+          <button onclick="closeModal()" class="theme-text hover:theme-accent-text theme-transition p-1">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <form id="add-word-form" class="space-y-4">
+          <input id="word-input" name="word" required type="text" placeholder="Word" class="theme-input w-full" />
+          <input id="definition-input" name="definition" required type="text" placeholder="Definition" class="theme-input w-full" />
+          <input id="example-input" name="example" required type="text" placeholder="Example Sentence" class="theme-input w-full" />
+          <select id="type-select" name="type" required class="theme-input w-full">
+            <option value="">Select Type</option>
+            <option value="noun">Noun</option>
+            <option value="verb">Verb</option>
+            <option value="adjective">Adjective</option>
+            <option value="adverb">Adverb</option>
+            <option value="preposition">Preposition</option>
+            <option value="conjunction">Conjunction</option>
+          </select>
+          <div class="flex gap-2 pt-2">
+            <button id="submitBtn" type="submit" class="theme-button flex-1">Add Word</button>
+            <button type="button" onclick="closeModal()" class="px-4 py-2 theme-secondary-bg theme-text rounded-lg hover:theme-accent-bg theme-transition">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="word-list" class="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <!-- Word cards will go here -->
+    </div>
+
+    <div id="pagination" class="mt-6 flex justify-center space-x-2"></div>
+  </main>
+  
+  <!-- Debug info -->
+  <div class="fixed bottom-4 left-4 theme-card p-3 text-sm opacity-75 max-w-xs">
+    <div class="font-bold mb-2">Debug Info:</div>
+    <div id="debug-status" class="theme-text text-xs">Initializing...</div>
+  </div>
+
+  <!-- Theme indicator -->
+  <div id="theme-indicator" class="theme-indicator"></div>
+
+  <script>
+    // Debug version - standalone functionality
+    let allWords = [];
+    let editingWordId = null;
+    let currentPage = 1;
+    const wordsPerPage = 6;
+
+    // Sample data that should always work
+    const sampleWords = [
+      {
+        id: 1,
+        text: "Ephemeral",
+        definition: "Lasting for a very short time.",
+        example: "The beauty of the cherry blossoms is ephemeral.",
+        type: "adjective",
+        date: "15 Jul 2023"
+      },
+      {
+        id: 2,
+        text: "Ubiquitous",
+        definition: "Present, appearing, or found everywhere.",
+        example: "Mobile phones are now ubiquitous.",
+        type: "adjective",
+        date: "16 Jul 2023"
+      },
+      {
+        id: 3,
+        text: "Serendipity",
+        definition: "The occurrence of events by chance in a happy way.",
+        example: "It was pure serendipity that I found this perfect book.",
+        type: "noun",
+        date: "17 Jul 2023"
+      }
+    ];
+
+    function openModal() {
+      const modal = document.getElementById('addModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        lucide.createIcons();
+      }
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('addModal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+      
+      editingWordId = null;
+      const modalTitle = document.getElementById('modalTitle');
+      const submitBtn = document.getElementById('submitBtn');
+      const form = document.getElementById('add-word-form');
+      
+      if (modalTitle) modalTitle.textContent = 'Add New Word';
+      if (submitBtn) submitBtn.textContent = 'Add Word';
+      if (form) form.reset();
+    }
+
+    function createWordCard(word, index) {
+      console.log('Creating debug card for:', word);
+      
+      const cardHTML = `
+        <div class="word-card relative theme-card p-4 soft-fade-in cursor-pointer group">
+          <button onclick="editWord('${word.id}')" class="absolute top-3 right-12 p-2 theme-secondary-bg rounded-full shadow-sm opacity-70 md:hidden md:group-hover:block theme-transition hover:theme-accent-bg" title="Edit word">
+            <i data-lucide="pencil" class="w-4 h-4 theme-text"></i>
+          </button>
+          <button onclick="deleteWord('${word.id}')" class="absolute top-3 right-2 p-2 theme-secondary-bg rounded-full shadow-sm opacity-70 md:hidden md:group-hover:block theme-transition hover:bg-red-500" title="Delete word">
+            <i data-lucide="trash-2" class="w-4 h-4 text-red-400 hover:text-white"></i>
+          </button>
+          <h2 class="text-xl md:text-2xl font-bold theme-text mb-2">${word.text}</h2>
+          <span class="inline-block text-sm theme-accent-bg px-3 py-1 rounded-full font-semibold" style="color: var(--theme-background);">${word.type}</span>
+          <div class="mt-4 space-y-3">
+            <p class="text-base md:text-sm theme-text leading-relaxed">${word.definition}</p>
+            <div class="bg-gradient-to-r from-transparent via-current to-transparent opacity-20 h-px"></div>
+            <p class="text-base md:text-sm theme-text font-medium leading-relaxed">
+              <span class="theme-accent-text opacity-75 text-sm">Example:</span><br>
+              <span class="italic font-semibold">"${word.example}"</span>
+            </p>
+          </div>
+          <p class="text-right text-sm theme-text opacity-75 mt-4 font-medium">${word.date}</p>
+        </div>
+      `;
+      
+      const container = document.createElement('div');
+      container.innerHTML = cardHTML;
+      const cardElement = container.firstElementChild;
+      
+      if (cardElement) {
+        cardElement.style.animationDelay = `${index * 0.1}s`;
+      }
+      
+      return cardElement;
+    }
+
+    function renderWords(words) {
+      console.log('Rendering debug words:', words);
+      const list = document.getElementById('word-list');
+      if (!list) return;
+      
+      list.innerHTML = '';
+      
+      if (!words || words.length === 0) {
+        list.innerHTML = '<div class="theme-card p-6 col-span-full text-center"><p class="theme-text">No words found. Add some vocabulary!</p></div>';
+        return;
+      }
+      
+      const paginatedWords = words.slice((currentPage - 1) * wordsPerPage, currentPage * wordsPerPage);
+      
+      paginatedWords.forEach((word, index) => {
+        const card = createWordCard(word, index);
+        if (card) {
+          list.appendChild(card);
+        }
+      });
+      
+      lucide.createIcons();
+    }
+
+    function editWord(id) {
+      const word = allWords.find(w => w.id == id);
+      if (!word) return;
+      
+      editingWordId = id;
+      openModal();
+      
+      setTimeout(() => {
+        document.getElementById('modalTitle').textContent = 'Edit Word';
+        document.getElementById('submitBtn').textContent = 'Update Word';
+        document.getElementById('word-input').value = word.text;
+        document.getElementById('definition-input').value = word.definition;
+        document.getElementById('example-input').value = word.example;
+        document.getElementById('type-select').value = word.type;
+      }, 100);
+    }
+
+    function deleteWord(id) {
+      if (!confirm('Delete this word?')) return;
+      allWords = allWords.filter(w => w.id != id);
+      localStorage.setItem('vocab-debug-words', JSON.stringify(allWords));
+      renderWords(allWords);
+      updateDebugInfo();
+    }
+
+    function updateDebugInfo() {
+      const debugStatus = document.getElementById('debug-status');
+      if (debugStatus) {
+        debugStatus.innerHTML = `
+          <div>Words: ${allWords.length}</div>
+          <div>Theme: Working</div>
+          <div>Modal: Ready</div>
+          <div>Cards: Rendered</div>
+        `;
+      }
+    }
+
+    // Form handling
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load data
+      const savedWords = localStorage.getItem('vocab-debug-words');
+      if (savedWords) {
+        allWords = JSON.parse(savedWords);
+      } else {
+        allWords = [...sampleWords];
+      }
+      
+      renderWords(allWords);
+      updateDebugInfo();
+
+      // Bind form
+      const form = document.getElementById('add-word-form');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          console.log('Debug form submitted!');
+          
+          const wordInput = document.getElementById('word-input');
+          const defInput = document.getElementById('definition-input');
+          const exampleInput = document.getElementById('example-input');
+          const typeSelect = document.getElementById('type-select');
+          
+          const wordData = {
+            id: editingWordId || Date.now(),
+            text: wordInput.value.trim(),
+            definition: defInput.value.trim(),
+            example: exampleInput.value.trim(),
+            type: typeSelect.value,
+            date: new Date().toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            })
+          };
+          
+          console.log('Debug word data:', wordData);
+          
+          if (editingWordId) {
+            const index = allWords.findIndex(w => w.id == editingWordId);
+            if (index !== -1) {
+              allWords[index] = wordData;
+            }
+          } else {
+            allWords.push(wordData);
+          }
+          
+          localStorage.setItem('vocab-debug-words', JSON.stringify(allWords));
+          renderWords(allWords);
+          closeModal();
+          updateDebugInfo();
+          alert(`Word ${editingWordId ? 'updated' : 'added'} successfully!`);
+        });
+      }
+
+      // Icons
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
